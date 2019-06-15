@@ -12,18 +12,9 @@ import (
 
 // BoolArg describes a boolean argument
 type BoolArg struct {
-	// The argument name as will be shown in help messages
-	Name string
-	// The argument description as will be shown in help messages
-	Desc string
-	// A space separated list of environment variables names to be used to initialize this argument
-	EnvVar string
+	Parameter
 	// The argument's initial value
 	Value bool
-	// A boolean to display or not the current value of the argument in the help message
-	HideValue bool
-	// Set to true if this arg was set by the user (as opposed to being set from env or not set at all)
-	SetByUser *bool
 }
 
 func (a BoolArg) value(into *bool) (flag.Value, *bool) {
@@ -35,18 +26,9 @@ func (a BoolArg) value(into *bool) (flag.Value, *bool) {
 
 // StringArg describes a string argument
 type StringArg struct {
-	// The argument name as will be shown in help messages
-	Name string
-	// The argument description as will be shown in help messages
-	Desc string
-	// A space separated list of environment variables names to be used to initialize this argument
-	EnvVar string
+	Parameter
 	// The argument's initial value
 	Value string
-	// A boolean to display or not the current value of the argument in the help message
-	HideValue bool
-	// Set to true if this arg was set by the user (as opposed to being set from env or not set at all)
-	SetByUser *bool
 }
 
 func (a StringArg) value(into *string) (flag.Value, *string) {
@@ -58,18 +40,9 @@ func (a StringArg) value(into *string) (flag.Value, *string) {
 
 // IntArg describes an int argument
 type IntArg struct {
-	// The argument name as will be shown in help messages
-	Name string
-	// The argument description as will be shown in help messages
-	Desc string
-	// A space separated list of environment variables names to be used to initialize this argument
-	EnvVar string
+	Parameter
 	// The argument's initial value
 	Value int
-	// A boolean to display or not the current value of the argument in the help message
-	HideValue bool
-	// Set to true if this arg was set by the user (as opposed to being set from env or not set at all)
-	SetByUser *bool
 }
 
 func (a IntArg) value(into *int) (flag.Value, *int) {
@@ -81,18 +54,9 @@ func (a IntArg) value(into *int) (flag.Value, *int) {
 
 // Float64Arg describes an float64 argument
 type Float64Arg struct {
-	// The argument name as will be shown in help messages
-	Name string
-	// The argument description as will be shown in help messages
-	Desc string
-	// A space separated list of environment variables names to be used to initialize this argument
-	EnvVar string
+	Parameter
 	// The argument's initial value
 	Value float64
-	// A boolean to display or not the current value of the argument in the help message
-	HideValue bool
-	// Set to true if this arg was set by the user (as opposed to being set from env or not set at all)
-	SetByUser *bool
 }
 
 func (a Float64Arg) value(into *float64) (flag.Value, *float64) {
@@ -104,19 +68,9 @@ func (a Float64Arg) value(into *float64) (flag.Value, *float64) {
 
 // StringsArg describes a string slice argument
 type StringsArg struct {
-	// The argument name as will be shown in help messages
-	Name string
-	// The argument description as will be shown in help messages
-	Desc string
-	// A space separated list of environment variables names to be used to initialize this argument.
-	// The env variable should contain a comma separated list of values
-	EnvVar string
+	Parameter
 	// The argument's initial value
 	Value []string
-	// A boolean to display or not the current value of the argument in the help message
-	HideValue bool
-	// Set to true if this arg was set by the user (as opposed to being set from env or not set at all)
-	SetByUser *bool
 }
 
 func (a StringsArg) value(into *[]string) (flag.Value, *[]string) {
@@ -128,19 +82,9 @@ func (a StringsArg) value(into *[]string) (flag.Value, *[]string) {
 
 // IntsArg describes an int slice argument
 type IntsArg struct {
-	// The argument name as will be shown in help messages
-	Name string
-	// The argument description as will be shown in help messages
-	Desc string
-	// A space separated list of environment variables names to be used to initialize this argument.
-	// The env variable should contain a comma separated list of values
-	EnvVar string
+	Parameter
 	// The argument's initial value
 	Value []int
-	// A boolean to display or not the current value of the argument in the help message
-	HideValue bool
-	// Set to true if this arg was set by the user (as opposed to being set from env or not set at all)
-	SetByUser *bool
 }
 
 func (a IntsArg) value(into *[]int) (flag.Value, *[]int) {
@@ -152,19 +96,9 @@ func (a IntsArg) value(into *[]int) (flag.Value, *[]int) {
 
 // Floats64Arg describes an int slice argument
 type Floats64Arg struct {
-	// The argument name as will be shown in help messages
-	Name string
-	// The argument description as will be shown in help messages
-	Desc string
-	// A space separated list of environment variables names to be used to initialize this argument.
-	// The env variable should contain a comma separated list of values
-	EnvVar string
+	Parameter
 	// The argument's initial value
 	Value []float64
-	// A boolean to display or not the current value of the argument in the help message
-	HideValue bool
-	// Set to true if this arg was set by the user (as opposed to being set from env or not set at all)
-	SetByUser *bool
 }
 
 func (a Floats64Arg) value(into *[]float64) (flag.Value, *[]float64) {
@@ -176,19 +110,9 @@ func (a Floats64Arg) value(into *[]float64) (flag.Value, *[]float64) {
 
 // VarArg describes an argument where the type and format of the value is controlled by the developer
 type VarArg struct {
-	// A space separated list of the option names *WITHOUT* the dashes, e.g. `f force` and *NOT* `-f --force`.
-	// The one letter names will then be called with a single dash (short option), the others with two (long options).
-	Name string
-	// The option description as will be shown in help messages
-	Desc string
-	// A space separated list of environment variables names to be used to initialize this option
-	EnvVar string
+	Parameter
 	// A value implementing the flag.Value type (will hold the final value)
 	Value flag.Value
-	// A boolean to display or not the current value of the option in the help message
-	HideValue bool
-	// Set to true if this arg was set by the user (as opposed to being set from env or not set at all)
-	SetByUser *bool
 }
 
 func (a VarArg) value() flag.Value {
@@ -202,9 +126,11 @@ The result should be stored in a variable (a pointer to a bool) which will be po
 */
 func (c *Cmd) BoolArg(name string, value bool, desc string) *bool {
 	return c.Bool(BoolArg{
-		Name:  name,
+		Parameter:Parameter{
+			Name:name,
+			Desc:desc,
+		},
 		Value: value,
-		Desc:  desc,
 	})
 }
 
@@ -215,9 +141,11 @@ The into parameter points to a variable (a pointer to a bool) which will be popu
 */
 func (c *Cmd) BoolArgPtr(into *bool, name string, value bool, desc string) {
 	c.BoolPtr(into, BoolArg{
-		Name:  name,
+		Parameter:Parameter{
+			Name:name,
+			Desc:desc,
+		},
 		Value: value,
-		Desc:  desc,
 	})
 }
 
@@ -228,9 +156,11 @@ The result should be stored in a variable (a pointer to a string) which will be 
 */
 func (c *Cmd) StringArg(name string, value string, desc string) *string {
 	return c.String(StringArg{
-		Name:  name,
+		Parameter:Parameter{
+			Name:name,
+			Desc:desc,
+		},
 		Value: value,
-		Desc:  desc,
 	})
 }
 
@@ -241,9 +171,11 @@ The into parameter points to a variable (a pointer to a string) which will be po
 */
 func (c *Cmd) StringArgPtr(into *string, name string, value string, desc string) {
 	c.StringPtr(into, StringArg{
-		Name:  name,
+		Parameter:Parameter{
+			Name:name,
+			Desc:desc,
+		},
 		Value: value,
-		Desc:  desc,
 	})
 }
 
@@ -254,9 +186,11 @@ The result should be stored in a variable (a pointer to an int) which will be po
 */
 func (c *Cmd) IntArg(name string, value int, desc string) *int {
 	return c.Int(IntArg{
-		Name:  name,
+		Parameter:Parameter{
+			Name:name,
+			Desc:desc,
+		},
 		Value: value,
-		Desc:  desc,
 	})
 }
 
@@ -267,9 +201,11 @@ The into parameter points to a variable (a pointer to a int) which will be popul
 */
 func (c *Cmd) IntArgPtr(into *int, name string, value int, desc string) {
 	c.IntPtr(into, IntArg{
-		Name:  name,
+		Parameter:Parameter{
+			Name:name,
+			Desc:desc,
+		},
 		Value: value,
-		Desc:  desc,
 	})
 }
 
@@ -280,9 +216,11 @@ The result should be stored in a variable (a pointer to an float64) which will b
 */
 func (c *Cmd) Float64Arg(name string, value float64, desc string) *float64 {
 	return c.Float64(Float64Arg{
-		Name:  name,
+		Parameter:Parameter{
+			Name:name,
+			Desc:desc,
+		},
 		Value: value,
-		Desc:  desc,
 	})
 }
 
@@ -293,9 +231,11 @@ The into parameter points to a variable (a pointer to a float64) which will be p
 */
 func (c *Cmd) Float64ArgPtr(into *float64, name string, value float64, desc string) {
 	c.Float64Ptr(into, Float64Arg{
-		Name:  name,
+		Parameter:Parameter{
+			Name:name,
+			Desc:desc,
+		},
 		Value: value,
-		Desc:  desc,
 	})
 }
 
@@ -306,9 +246,11 @@ The result should be stored in a variable (a pointer to a string slice) which wi
 */
 func (c *Cmd) StringsArg(name string, value []string, desc string) *[]string {
 	return c.Strings(StringsArg{
-		Name:  name,
+		Parameter:Parameter{
+			Name:name,
+			Desc:desc,
+		},
 		Value: value,
-		Desc:  desc,
 	})
 }
 
@@ -319,9 +261,11 @@ The into parameter points to a variable (a pointer to a string slice) which will
 */
 func (c *Cmd) StringsArgPtr(into *[]string, name string, value []string, desc string) {
 	c.StringsPtr(into, StringsArg{
-		Name:  name,
+		Parameter:Parameter{
+			Name:name,
+			Desc:desc,
+		},
 		Value: value,
-		Desc:  desc,
 	})
 }
 
@@ -332,9 +276,11 @@ The result should be stored in a variable (a pointer to an int slice) which will
 */
 func (c *Cmd) IntsArg(name string, value []int, desc string) *[]int {
 	return c.Ints(IntsArg{
-		Name:  name,
+		Parameter:Parameter{
+			Name:name,
+			Desc:desc,
+		},
 		Value: value,
-		Desc:  desc,
 	})
 }
 
@@ -345,9 +291,11 @@ The into parameter points to a variable (a pointer to a int slice) which will be
 */
 func (c *Cmd) IntsArgPtr(into *[]int, name string, value []int, desc string) {
 	c.IntsPtr(into, IntsArg{
-		Name:  name,
+		Parameter:Parameter{
+			Name:name,
+			Desc:desc,
+		},
 		Value: value,
-		Desc:  desc,
 	})
 }
 
@@ -358,9 +306,11 @@ The result should be stored in a variable (a pointer to an float64 slice) which 
 */
 func (c *Cmd) Floats64Arg(name string, value []float64, desc string) *[]float64 {
 	return c.Floats64(Floats64Arg{
-		Name:  name,
+		Parameter:Parameter{
+			Name:name,
+			Desc:desc,
+		},
 		Value: value,
-		Desc:  desc,
 	})
 }
 
@@ -371,9 +321,11 @@ The into parameter points to a variable (a pointer to a float64 slice) which wil
 */
 func (c *Cmd) Floats64ArgPtr(into *[]float64, name string, value []float64, desc string) {
 	c.Floats64Ptr(into, Floats64Arg{
-		Name:  name,
+		Parameter:Parameter{
+			Name:name,
+			Desc:desc,
+		},
 		Value: value,
-		Desc:  desc,
 	})
 }
 

@@ -9,7 +9,7 @@ import (
 	"github.com/jawher/mow.cli/internal/values"
 )
 
-type Opt struct {
+type Parameter struct {
 	// A space separated list of the option names *WITHOUT* the dashes, e.g. `f force` and *NOT* `-f --force`.
 	// The one letter names will then be called with a single dash (short option), the others with two (long options).
 	Name string
@@ -25,7 +25,7 @@ type Opt struct {
 
 // BoolOpt describes a boolean option
 type BoolOpt struct {
-	Opt
+	Parameter
 	Value bool
 }
 
@@ -38,7 +38,7 @@ func (o BoolOpt) value(into *bool) (flag.Value, *bool) {
 
 // StringOpt describes a string option
 type StringOpt struct {
-	Opt
+	Parameter
 	Value string
 }
 
@@ -51,7 +51,7 @@ func (o StringOpt) value(into *string) (flag.Value, *string) {
 
 // IntOpt describes an int option
 type IntOpt struct {
-	Opt
+	Parameter
 	Value int
 }
 
@@ -64,7 +64,7 @@ func (o IntOpt) value(into *int) (flag.Value, *int) {
 
 // Float64Opt describes an float64 option
 type Float64Opt struct {
-	Opt
+	Parameter
 	// The option's initial value
 	Value float64
 }
@@ -78,7 +78,7 @@ func (o Float64Opt) value(into *float64) (flag.Value, *float64) {
 
 // StringsOpt describes a string slice option
 type StringsOpt struct {
-	Opt
+	Parameter
 	Value []string
 }
 
@@ -91,7 +91,7 @@ func (o StringsOpt) value(into *[]string) (flag.Value, *[]string) {
 
 // IntsOpt describes an int slice option
 type IntsOpt struct {
-	Opt
+	Parameter
 	Value []int
 }
 
@@ -105,7 +105,7 @@ func (o IntsOpt) value(into *[]int) (flag.Value, *[]int) {
 
 // Floats64Opt describes an int slice option
 type Floats64Opt struct {
-	Opt
+	Parameter
 	Value []float64
 }
 
@@ -119,7 +119,7 @@ func (o Floats64Opt) value(into *[]float64) (flag.Value, *[]float64) {
 
 // VarOpt describes an option where the type and format of the value is controlled by the developer
 type VarOpt struct {
-	Opt
+	Parameter
 	// A value implementing the flag.Value type (will hold the final value)
 	Value flag.Value
 }
@@ -139,7 +139,7 @@ The result should be stored in a variable (a pointer to a bool) which will be po
 */
 func (c *Cmd) BoolOpt(name string, value bool, desc string) *bool {
 	return c.Bool(BoolOpt{
-		Opt: Opt{
+		Parameter: Parameter{
 			Name: name,
 			Desc: desc,
 		},
@@ -158,7 +158,7 @@ The into parameter points to a variable (a pointer to a int slice) which will be
 */
 func (c *Cmd) BoolOptPtr(into *bool, name string, value bool, desc string) {
 	c.BoolPtr(into, BoolOpt{
-		Opt: Opt{
+		Parameter: Parameter{
 			Name: name,
 			Desc: desc,
 		},
@@ -177,7 +177,7 @@ The result should be stored in a variable (a pointer to a string) which will be 
 */
 func (c *Cmd) StringOpt(name string, value string, desc string) *string {
 	return c.String(StringOpt{
-		Opt: Opt{
+		Parameter: Parameter{
 			Name: name,
 			Desc: desc,
 		},
@@ -196,7 +196,7 @@ The into parameter points to a variable (a pointer to a int slice) which will be
 */
 func (c *Cmd) StringOptPtr(into *string, name string, value string, desc string) {
 	c.StringPtr(into, StringOpt{
-		Opt: Opt{
+		Parameter: Parameter{
 			Name: name,
 			Desc: desc,
 		},
@@ -215,7 +215,7 @@ The result should be stored in a variable (a pointer to an int) which will be po
 */
 func (c *Cmd) IntOpt(name string, value int, desc string) *int {
 	return c.Int(IntOpt{
-		Opt: Opt{
+		Parameter: Parameter{
 			Name: name,
 			Desc: desc,
 		},
@@ -234,7 +234,7 @@ The into parameter points to a variable (a pointer to an int) which will be popu
 */
 func (c *Cmd) IntOptPtr(into *int, name string, value int, desc string) {
 	c.IntPtr(into, IntOpt{
-		Opt: Opt{
+		Parameter: Parameter{
 			Name: name,
 			Desc: desc,
 		},
@@ -253,7 +253,7 @@ The result should be stored in a variable (a pointer to an float64) which will b
 */
 func (c *Cmd) Float64Opt(name string, value float64, desc string) *float64 {
 	return c.Float64(Float64Opt{
-		Opt: Opt{
+		Parameter: Parameter{
 			Name: name,
 			Desc: desc,
 		},
@@ -272,7 +272,7 @@ The into parameter points to a variable (a pointer to a float64) which will be p
 */
 func (c *Cmd) Float64OptPtr(into *float64, name string, value float64, desc string) {
 	c.Float64Ptr(into, Float64Opt{
-		Opt: Opt{
+		Parameter: Parameter{
 			Name: name,
 			Desc: desc,
 		},
@@ -291,7 +291,7 @@ The result should be stored in a variable (a pointer to a string slice) which wi
 */
 func (c *Cmd) StringsOpt(name string, value []string, desc string) *[]string {
 	return c.Strings(StringsOpt{
-		Opt: Opt{
+		Parameter: Parameter{
 			Name: name,
 			Desc: desc,
 		},
@@ -310,7 +310,7 @@ The into parameter points to a variable (a pointer to a int slice) which will be
 */
 func (c *Cmd) StringsOptPtr(into *[]string, name string, value []string, desc string) {
 	c.StringsPtr(into, StringsOpt{
-		Opt: Opt{
+		Parameter: Parameter{
 			Name: name,
 			Desc: desc,
 		},
@@ -329,7 +329,7 @@ The result should be stored in a variable (a pointer to an int slice) which will
 */
 func (c *Cmd) IntsOpt(name string, value []int, desc string) *[]int {
 	return c.Ints(IntsOpt{
-		Opt: Opt{
+		Parameter: Parameter{
 			Name: name,
 			Desc: desc,
 		},
@@ -348,7 +348,7 @@ The into parameter points to a variable (a pointer to a int slice) which will be
 */
 func (c *Cmd) IntsOptPtr(into *[]int, name string, value []int, desc string) {
 	c.IntsPtr(into, IntsOpt{
-		Opt: Opt{
+		Parameter: Parameter{
 			Name: name,
 			Desc: desc,
 		},
@@ -367,7 +367,7 @@ The result should be stored in a variable (a pointer to an float64 slice) which 
 */
 func (c *Cmd) Floats64Opt(name string, value []float64, desc string) *[]float64 {
 	return c.Floats64(Floats64Opt{
-		Opt: Opt{
+		Parameter: Parameter{
 			Name: name,
 			Desc: desc,
 		},
@@ -386,7 +386,7 @@ The into parameter points to a variable (a pointer to a int slice) which will be
 */
 func (c *Cmd) Floats64OptPtr(into *[]float64, name string, value []float64, desc string) {
 	c.Floats64Ptr(into, Floats64Opt{
-		Opt: Opt{
+		Parameter: Parameter{
 			Name: name,
 			Desc: desc,
 		},

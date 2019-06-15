@@ -55,7 +55,7 @@ printing the version string via the CLI.
 */
 func (cli *Cli) Version(name, version string) {
 	cli.Bool(BoolOpt{
-		Opt:Opt{
+		Parameter:Parameter{
 			Name:name,
 			Desc:"Show the version and exit",
 			HideValue:true,
