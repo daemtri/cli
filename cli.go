@@ -54,14 +54,7 @@ printing the version string via the CLI.
 
 */
 func (cli *Cli) Version(name, version string) {
-	cli.Bool(BoolOpt{
-		Parameter:Parameter{
-			Name:name,
-			Desc:"Show the version and exit",
-			HideValue:true,
-		},
-		Value:     false,
-	})
+	cli.Option(name, "Show the version and exit").Hide().Bool(false)
 	names := mkOptStrs(name)
 	option := cli.optionsIdx[names[0]]
 	cli.version = &cliVersion{version, option}

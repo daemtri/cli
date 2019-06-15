@@ -1,6 +1,8 @@
 package container
 
-import "flag"
+import (
+	"flag"
+)
 
 /*
 Container holds an option or an arg data

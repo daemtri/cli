@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"strconv"
+	"time"
 )
 
 // BoolValued is an interface values can implement to indicate that they are a bool option, i.e. can be set without providing a value with just -f for example
@@ -69,8 +70,40 @@ func (bo *BoolValue) IsDefault() bool {
 	return !bool(*bo)
 }
 
+
 /******************************************************************************/
-/* STRING                                                                        */
+/* Duration                                                                   */
+/******************************************************************************/
+
+// BoolValue is a flag.Value type holding boolean values
+type DurationValue time.Duration
+
+var (
+	_ flag.Value    = NewDuration(new(time.Duration), 0)
+)
+
+// NewBool creates a new bool value
+func NewDuration(into *time.Duration, v time.Duration) *DurationValue {
+	*into = v
+	return (*DurationValue)(into)
+}
+
+// Set sets the value from a provided string
+func (du *DurationValue) Set(s string) error {
+	b, err := time.ParseDuration(s)
+	if err != nil {
+		return err
+	}
+	*du = DurationValue(b)
+	return nil
+}
+
+func (du *DurationValue) String() string {
+	return time.Duration(*du).String()
+}
+
+/******************************************************************************/
+/* STRING                                                                     */
 /******************************************************************************/
 
 // StringValue is a flag.Value type holding string values
@@ -125,12 +158,106 @@ func (ia *IntValue) Set(s string) error {
 	if err != nil {
 		return err
 	}
-	*ia = IntValue(int(i))
+	*ia = IntValue(i)
 	return nil
 }
 
 func (ia *IntValue) String() string {
 	return fmt.Sprintf("%v", *ia)
+}
+
+
+/******************************************************************************/
+/* INT64                                                                      */
+/******************************************************************************/
+
+// IntValue is a flag.Value type holding int values
+type Int64Value int64
+
+var (
+	_ flag.Value = NewInt64(new(int64), 0)
+)
+
+// NewInt creates a new int value
+func NewInt64(into *int64, v int64) *Int64Value {
+	*into = v
+	return (*Int64Value)(into)
+}
+
+// Set sets the value from a provided string
+func (ia *Int64Value) Set(s string) error {
+	i, err := strconv.ParseInt(s, 10, 64)
+	if err != nil {
+		return err
+	}
+	*ia = Int64Value(i)
+	return nil
+}
+
+func (ia *Int64Value) String() string {
+	return fmt.Sprintf("%v", *ia)
+}
+
+/******************************************************************************/
+/* UINT                                                                       */
+/******************************************************************************/
+
+// IntValue is a flag.Value type holding int values
+type UintValue uint
+
+var (
+	_ flag.Value = NewUint(new(uint), 0)
+)
+
+// NewInt creates a new int value
+func NewUint(into *uint, v uint) *UintValue {
+	*into = v
+	return (*UintValue)(into)
+}
+
+// Set sets the value from a provided string
+func (uv *UintValue) Set(s string) error {
+	i, err := strconv.ParseUint(s, 10, 64)
+	if err != nil {
+		return err
+	}
+	*uv = UintValue(i)
+	return nil
+}
+
+func (uv *UintValue) String() string {
+	return fmt.Sprintf("%v", *uv)
+}
+
+/******************************************************************************/
+/* UINT64                                                                     */
+/******************************************************************************/
+
+// IntValue is a flag.Value type holding int values
+type Uint64Value uint64
+
+var (
+	_ flag.Value = NewUint64(new(uint64), 0)
+)
+
+// NewInt creates a new int value
+func NewUint64(into *uint64, v uint64) *Uint64Value {
+	*into = v
+	return (*Uint64Value)(into)
+}
+
+// Set sets the value from a provided string
+func (uv *Uint64Value) Set(s string) error {
+	i, err := strconv.ParseUint(s, 10, 64)
+	if err != nil {
+		return err
+	}
+	*uv = Uint64Value(i)
+	return nil
+}
+
+func (uv *Uint64Value) String() string {
+	return fmt.Sprintf("%v", *uv)
 }
 
 /******************************************************************************/
