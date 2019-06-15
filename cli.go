@@ -45,16 +45,13 @@ func App(name, desc string) *Cli {
 	}
 }
 
-/*
-Version sets the version string of the CLI app together with the options that can be used to trigger
-printing the version string via the CLI.
-
-	Usage: appName --$name
-	$version
-
-*/
+// Version sets the version string of the CLI app together with the options that can be used to trigger
+// printing the version string via the CLI.
+//
+//	Usage: appName --$name
+//	$version
 func (cli *Cli) Version(name, version string) {
-	cli.Option(name, "Show the version and exit").Hide().Bool(false)
+	cli.Option(name, "Show the version and exit").Bool(false)
 	names := mkOptStrs(name)
 	option := cli.optionsIdx[names[0]]
 	cli.version = &cliVersion{version, option}

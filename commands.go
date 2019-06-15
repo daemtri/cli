@@ -15,11 +15,9 @@ import (
 	"github.com/jawher/mow.cli/internal/values"
 )
 
-/*
-Cmd represents a command (or sub command) in a CLI application. It should be constructed
-by calling Command() on an app to create a top level command or by calling Command() on another
-command to create a sub command
-*/
+// Cmd represents a command (or sub command) in a CLI application. It should be constructed
+// by calling Command() on an app to create a top level command or by calling Command() on another
+// command to create a sub command
 type Cmd struct {
 	// The code to execute when this command is matched
 	Action func()
@@ -50,24 +48,20 @@ type Cmd struct {
 	fsm *fsm.State
 }
 
-/*
-CmdInitializer is a function that configures a command by adding options, arguments, a spec, sub commands and the code
-to execute when the command is called
-*/
+// CmdInitializer is a function that configures a command by adding options, arguments, a spec, sub commands and the code
+// to execute when the command is called
 type CmdInitializer func(*Cmd)
 
-/*
-Command adds a new (sub) command to c where name is the command name (what you type in the console),
-description is what would be shown in the help messages, e.g.:
-
-	Usage: git [OPTIONS] COMMAND [arg...]
-
-	Commands:
-	  $name	$desc
-
-the last argument, init, is a function that will be called by mow.cli to further configure the created
-(sub) command, e.g. to add options, arguments and the code to execute
-*/
+// Command adds a new (sub) command to c where name is the command name (what you type in the console),
+// description is what would be shown in the help messages, e.g.:
+//
+//	Usage: git [OPTIONS] COMMAND [arg...]
+//
+//	Commands:
+//	  $name	$desc
+//
+// the last argument, init, is a function that will be called by mow.cli to further configure the created
+// (sub) command, e.g. to add options, arguments and the code to execute
 func (c *Cmd) Command(name, desc string, init CmdInitializer) {
 	aliases := strings.Fields(name)
 	c.commands = append(c.commands, &Cmd{
@@ -141,20 +135,16 @@ func (c *Cmd) onError(err error) {
 
 }
 
-/*
-PrintHelp prints the command's help message.
-In most cases the library users won't need to call this method, unless
-a more complex validation is needed
-*/
+// PrintHelp prints the command's help message.
+// In most cases the library users won't need to call this method, unless
+// a more complex validation is needed
 func (c *Cmd) PrintHelp() {
 	c.printHelp(false)
 }
 
-/*
-PrintLongHelp prints the command's help message using the command long description if specified.
-In most cases the library users won't need to call this method, unless
-a more complex validation is needed
-*/
+// PrintLongHelp prints the command's help message using the command long description if specified.
+// In most cases the library users won't need to call this method, unless
+// a more complex validation is needed
 func (c *Cmd) PrintLongHelp() {
 	c.printHelp(true)
 }
@@ -162,66 +152,70 @@ func (c *Cmd) PrintLongHelp() {
 func (c *Cmd) printHelp(longDesc bool) {
 	full := append(c.parents, c.name)
 	path := strings.Join(full, " ")
-	fmt.Fprintf(stdErr, "\nUsage: %s", path)
+	_,_ = fmt.Fprintf(stdErr, "\nUsage: %s", path)
 
 	spec := strings.TrimSpace(c.Spec)
 	if len(spec) > 0 {
-		fmt.Fprintf(stdErr, " %s", spec)
+		_,_ = fmt.Fprintf(stdErr, " %s", spec)
 	}
 
 	if len(c.commands) > 0 {
-		fmt.Fprint(stdErr, " COMMAND [arg...]")
+		_,_ =fmt.Fprint(stdErr, " COMMAND [arg...]")
 	}
-	fmt.Fprint(stdErr, "\n\n")
+	_,_ =fmt.Fprint(stdErr, "\n\n")
 
 	desc := c.desc
 	if longDesc && len(c.LongDesc) > 0 {
 		desc = c.LongDesc
 	}
 	if len(desc) > 0 {
-		fmt.Fprintf(stdErr, "%s\n", desc)
+		_,_ =fmt.Fprintf(stdErr, "%s\n", desc)
 	}
 
 	w := tabwriter.NewWriter(stdErr, 15, 1, 3, ' ', 0)
 
 	if len(c.args) > 0 {
-		fmt.Fprint(w, "\t\nArguments:\t\n")
-
+		_,_ =fmt.Fprint(w, "\t\nArguments:\t\n")
 		for _, arg := range c.args {
+			if arg.HideValue {
+				continue
+			}
 			var (
 				env   = formatEnvVarsForHelp(arg.EnvVar)
-				value = formatValueForHelp(arg.HideValue, arg.Value)
+				value = formatValueForHelp(arg.Value)
 			)
 			printTabbedRow(w, arg.Name, joinStrings(arg.Desc, env, value))
 		}
 	}
 
 	if len(c.options) > 0 {
-		fmt.Fprint(w, "\t\nOptions:\t\n")
-
+		_,_ =fmt.Fprint(w, "\t\nOptions:\t\n")
 		for _, opt := range c.options {
+			if opt.HideValue {
+				continue
+			}
 			var (
 				optNames = formatOptNamesForHelp(opt)
 				env      = formatEnvVarsForHelp(opt.EnvVar)
-				value    = formatValueForHelp(opt.HideValue, opt.Value)
+				value    = formatValueForHelp(opt.Value)
 			)
 			printTabbedRow(w, optNames, joinStrings(opt.Desc, env, value))
 		}
 	}
 
 	if len(c.commands) > 0 {
-		fmt.Fprint(w, "\t\nCommands:\t\n")
+		_,_ =fmt.Fprint(w, "\t\nCommands:\t\n")
 
 		for _, c := range c.commands {
-			fmt.Fprintf(w, "  %s\t%s\n", strings.Join(c.aliases, ", "), c.desc)
+			_,_ =fmt.Fprintf(w, "  %s\t%s\n", strings.Join(c.aliases, ", "), c.desc)
 		}
 	}
 
 	if len(c.commands) > 0 {
-		fmt.Fprintf(w, "\t\nRun '%s COMMAND --help' for more information on a command.\n", path)
+		_,_ =fmt.Fprintf(w, "\t\nRun '%s COMMAND --help' for more information on a command.\n", path)
 	}
 
-	w.Flush()
+	_ = w.Flush()
 }
 
 func formatOptNamesForHelp(o *container.Container) string {
@@ -250,11 +244,7 @@ func formatOptNamesForHelp(o *container.Container) string {
 	}
 }
 
-func formatValueForHelp(hide bool, v flag.Value) string {
-	if hide {
-		return ""
-	}
-
+func formatValueForHelp(v flag.Value) string {
 	if dv, ok := v.(values.DefaultValued); ok {
 		if dv.IsDefault() {
 			return ""
@@ -415,13 +405,13 @@ func joinStrings(parts ...string) string {
 
 func printTabbedRow(w io.Writer, s1 string, s2 string) {
 	lines := strings.Split(s2, "\n")
-	fmt.Fprintf(w, "  %s\t%s\n", s1, strings.TrimSpace(lines[0]))
+	_,_ = fmt.Fprintf(w, "  %s\t%s\n", s1, strings.TrimSpace(lines[0]))
 
 	if len(lines) == 1 {
 		return
 	}
 
 	for _, line := range lines[1:] {
-		fmt.Fprintf(w, "  %s\t%s\n", "", strings.TrimSpace(line))
+		_,_ = fmt.Fprintf(w, "  %s\t%s\n", "", strings.TrimSpace(line))
 	}
 }
