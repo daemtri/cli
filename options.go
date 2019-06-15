@@ -9,8 +9,7 @@ import (
 	"github.com/jawher/mow.cli/internal/values"
 )
 
-// BoolOpt describes a boolean option
-type BoolOpt struct {
+type Opt struct {
 	// A space separated list of the option names *WITHOUT* the dashes, e.g. `f force` and *NOT* `-f --force`.
 	// The one letter names will then be called with a single dash (short option), the others with two (long options).
 	Name string
@@ -18,12 +17,16 @@ type BoolOpt struct {
 	Desc string
 	// A space separated list of environment variables names to be used to initialize this option
 	EnvVar string
-	// The option's initial value
-	Value bool
 	// A boolean to display or not the current value of the option in the help message
 	HideValue bool
 	// Set to true if this option was set by the user (as opposed to being set from env or not set at all)
 	SetByUser *bool
+}
+
+// BoolOpt describes a boolean option
+type BoolOpt struct {
+	Opt
+	Value bool
 }
 
 func (o BoolOpt) value(into *bool) (flag.Value, *bool) {
@@ -35,19 +38,8 @@ func (o BoolOpt) value(into *bool) (flag.Value, *bool) {
 
 // StringOpt describes a string option
 type StringOpt struct {
-	// A space separated list of the option names *WITHOUT* the dashes, e.g. `f force` and *NOT* `-f --force`.
-	// The one letter names will then be called with a single dash (short option), the others with two (long options).
-	Name string
-	// The option description as will be shown in help messages
-	Desc string
-	// A space separated list of environment variables names to be used to initialize this option
-	EnvVar string
-	// The option's initial value
+	Opt
 	Value string
-	// A boolean to display or not the current value of the option in the help message
-	HideValue bool
-	// Set to true if this option was set by the user (as opposed to being set from env or not set at all)
-	SetByUser *bool
 }
 
 func (o StringOpt) value(into *string) (flag.Value, *string) {
@@ -59,19 +51,8 @@ func (o StringOpt) value(into *string) (flag.Value, *string) {
 
 // IntOpt describes an int option
 type IntOpt struct {
-	// A space separated list of the option names *WITHOUT* the dashes, e.g. `f force` and *NOT* `-f --force`.
-	// The one letter names will then be called with a single dash (short option), the others with two (long options).
-	Name string
-	// The option description as will be shown in help messages
-	Desc string
-	// A space separated list of environment variables names to be used to initialize this option
-	EnvVar string
-	// The option's initial value
+	Opt
 	Value int
-	// A boolean to display or not the current value of the option in the help message
-	HideValue bool
-	// Set to true if this option was set by the user (as opposed to being set from env or not set at all)
-	SetByUser *bool
 }
 
 func (o IntOpt) value(into *int) (flag.Value, *int) {
@@ -83,19 +64,9 @@ func (o IntOpt) value(into *int) (flag.Value, *int) {
 
 // Float64Opt describes an float64 option
 type Float64Opt struct {
-	// A space separated list of the option names *WITHOUT* the dashes, e.g. `f force` and *NOT* `-f --force`.
-	// The one letter names will then be called with a single dash (short option), the others with two (long options).
-	Name string
-	// The option description as will be shown in help messages
-	Desc string
-	// A space separated list of environment variables names to be used to initialize this option
-	EnvVar string
+	Opt
 	// The option's initial value
 	Value float64
-	// A boolean to display or not the current value of the option in the help message
-	HideValue bool
-	// Set to true if this option was set by the user (as opposed to being set from env or not set at all)
-	SetByUser *bool
 }
 
 func (o Float64Opt) value(into *float64) (flag.Value, *float64) {
@@ -107,20 +78,8 @@ func (o Float64Opt) value(into *float64) (flag.Value, *float64) {
 
 // StringsOpt describes a string slice option
 type StringsOpt struct {
-	// A space separated list of the option names *WITHOUT* the dashes, e.g. `f force` and *NOT* `-f --force`.
-	// The one letter names will then be called with a single dash (short option), the others with two (long options).
-	Name string
-	// The option description as will be shown in help messages
-	Desc string
-	// A space separated list of environment variables names to be used to initialize this option.
-	// The env variable should contain a comma separated list of values
-	EnvVar string
-	// The option's initial value
+	Opt
 	Value []string
-	// A boolean to display or not the current value of the option in the help message
-	HideValue bool
-	// Set to true if this option was set by the user (as opposed to being set from env or not set at all)
-	SetByUser *bool
 }
 
 func (o StringsOpt) value(into *[]string) (flag.Value, *[]string) {
@@ -132,20 +91,8 @@ func (o StringsOpt) value(into *[]string) (flag.Value, *[]string) {
 
 // IntsOpt describes an int slice option
 type IntsOpt struct {
-	// A space separated list of the option names *WITHOUT* the dashes, e.g. `f force` and *NOT* `-f --force`.
-	// The one letter names will then be called with a single dash (short option), the others with two (long options).
-	Name string
-	// The option description as will be shown in help messages
-	Desc string
-	// A space separated list of environment variables names to be used to initialize this option.
-	// The env variable should contain a comma separated list of values
-	EnvVar string
-	// The option's initial value
+	Opt
 	Value []int
-	// A boolean to display or not the current value of the option in the help message
-	HideValue bool
-	// Set to true if this option was set by the user (as opposed to being set from env or not set at all)
-	SetByUser *bool
 }
 
 func (o IntsOpt) value(into *[]int) (flag.Value, *[]int) {
@@ -158,20 +105,8 @@ func (o IntsOpt) value(into *[]int) (flag.Value, *[]int) {
 
 // Floats64Opt describes an int slice option
 type Floats64Opt struct {
-	// A space separated list of the option names *WITHOUT* the dashes, e.g. `f force` and *NOT* `-f --force`.
-	// The one letter names will then be called with a single dash (short option), the others with two (long options).
-	Name string
-	// The option description as will be shown in help messages
-	Desc string
-	// A space separated list of environment variables names to be used to initialize this option.
-	// The env variable should contain a comma separated list of values
-	EnvVar string
-	// The option's initial value
+	Opt
 	Value []float64
-	// A boolean to display or not the current value of the option in the help message
-	HideValue bool
-	// Set to true if this option was set by the user (as opposed to being set from env or not set at all)
-	SetByUser *bool
 }
 
 func (o Floats64Opt) value(into *[]float64) (flag.Value, *[]float64) {
@@ -184,19 +119,9 @@ func (o Floats64Opt) value(into *[]float64) (flag.Value, *[]float64) {
 
 // VarOpt describes an option where the type and format of the value is controlled by the developer
 type VarOpt struct {
-	// A space separated list of the option names *WITHOUT* the dashes, e.g. `f force` and *NOT* `-f --force`.
-	// The one letter names will then be called with a single dash (short option), the others with two (long options).
-	Name string
-	// The option description as will be shown in help messages
-	Desc string
-	// A space separated list of environment variables names to be used to initialize this option
-	EnvVar string
+	Opt
 	// A value implementing the flag.Value type (will hold the final value)
 	Value flag.Value
-	// A boolean to display or not the current value of the option in the help message
-	HideValue bool
-	// Set to true if this option was set by the user (as opposed to being set from env or not set at all)
-	SetByUser *bool
 }
 
 func (o VarOpt) value() flag.Value {
@@ -214,9 +139,11 @@ The result should be stored in a variable (a pointer to a bool) which will be po
 */
 func (c *Cmd) BoolOpt(name string, value bool, desc string) *bool {
 	return c.Bool(BoolOpt{
-		Name:  name,
+		Opt: Opt{
+			Name: name,
+			Desc: desc,
+		},
 		Value: value,
-		Desc:  desc,
 	})
 }
 
@@ -231,9 +158,11 @@ The into parameter points to a variable (a pointer to a int slice) which will be
 */
 func (c *Cmd) BoolOptPtr(into *bool, name string, value bool, desc string) {
 	c.BoolPtr(into, BoolOpt{
-		Name:  name,
+		Opt: Opt{
+			Name: name,
+			Desc: desc,
+		},
 		Value: value,
-		Desc:  desc,
 	})
 }
 
@@ -248,9 +177,11 @@ The result should be stored in a variable (a pointer to a string) which will be 
 */
 func (c *Cmd) StringOpt(name string, value string, desc string) *string {
 	return c.String(StringOpt{
-		Name:  name,
+		Opt: Opt{
+			Name: name,
+			Desc: desc,
+		},
 		Value: value,
-		Desc:  desc,
 	})
 }
 
@@ -265,9 +196,11 @@ The into parameter points to a variable (a pointer to a int slice) which will be
 */
 func (c *Cmd) StringOptPtr(into *string, name string, value string, desc string) {
 	c.StringPtr(into, StringOpt{
-		Name:  name,
+		Opt: Opt{
+			Name: name,
+			Desc: desc,
+		},
 		Value: value,
-		Desc:  desc,
 	})
 }
 
@@ -282,9 +215,11 @@ The result should be stored in a variable (a pointer to an int) which will be po
 */
 func (c *Cmd) IntOpt(name string, value int, desc string) *int {
 	return c.Int(IntOpt{
-		Name:  name,
+		Opt: Opt{
+			Name: name,
+			Desc: desc,
+		},
 		Value: value,
-		Desc:  desc,
 	})
 }
 
@@ -299,9 +234,11 @@ The into parameter points to a variable (a pointer to an int) which will be popu
 */
 func (c *Cmd) IntOptPtr(into *int, name string, value int, desc string) {
 	c.IntPtr(into, IntOpt{
-		Name:  name,
+		Opt: Opt{
+			Name: name,
+			Desc: desc,
+		},
 		Value: value,
-		Desc:  desc,
 	})
 }
 
@@ -316,9 +253,11 @@ The result should be stored in a variable (a pointer to an float64) which will b
 */
 func (c *Cmd) Float64Opt(name string, value float64, desc string) *float64 {
 	return c.Float64(Float64Opt{
-		Name:  name,
+		Opt: Opt{
+			Name: name,
+			Desc: desc,
+		},
 		Value: value,
-		Desc:  desc,
 	})
 }
 
@@ -333,9 +272,11 @@ The into parameter points to a variable (a pointer to a float64) which will be p
 */
 func (c *Cmd) Float64OptPtr(into *float64, name string, value float64, desc string) {
 	c.Float64Ptr(into, Float64Opt{
-		Name:  name,
+		Opt: Opt{
+			Name: name,
+			Desc: desc,
+		},
 		Value: value,
-		Desc:  desc,
 	})
 }
 
@@ -350,9 +291,11 @@ The result should be stored in a variable (a pointer to a string slice) which wi
 */
 func (c *Cmd) StringsOpt(name string, value []string, desc string) *[]string {
 	return c.Strings(StringsOpt{
-		Name:  name,
+		Opt: Opt{
+			Name: name,
+			Desc: desc,
+		},
 		Value: value,
-		Desc:  desc,
 	})
 }
 
@@ -367,9 +310,11 @@ The into parameter points to a variable (a pointer to a int slice) which will be
 */
 func (c *Cmd) StringsOptPtr(into *[]string, name string, value []string, desc string) {
 	c.StringsPtr(into, StringsOpt{
-		Name:  name,
+		Opt: Opt{
+			Name: name,
+			Desc: desc,
+		},
 		Value: value,
-		Desc:  desc,
 	})
 }
 
@@ -384,9 +329,11 @@ The result should be stored in a variable (a pointer to an int slice) which will
 */
 func (c *Cmd) IntsOpt(name string, value []int, desc string) *[]int {
 	return c.Ints(IntsOpt{
-		Name:  name,
+		Opt: Opt{
+			Name: name,
+			Desc: desc,
+		},
 		Value: value,
-		Desc:  desc,
 	})
 }
 
@@ -401,9 +348,11 @@ The into parameter points to a variable (a pointer to a int slice) which will be
 */
 func (c *Cmd) IntsOptPtr(into *[]int, name string, value []int, desc string) {
 	c.IntsPtr(into, IntsOpt{
-		Name:  name,
+		Opt: Opt{
+			Name: name,
+			Desc: desc,
+		},
 		Value: value,
-		Desc:  desc,
 	})
 }
 
@@ -418,9 +367,11 @@ The result should be stored in a variable (a pointer to an float64 slice) which 
 */
 func (c *Cmd) Floats64Opt(name string, value []float64, desc string) *[]float64 {
 	return c.Floats64(Floats64Opt{
-		Name:  name,
+		Opt: Opt{
+			Name: name,
+			Desc: desc,
+		},
 		Value: value,
-		Desc:  desc,
 	})
 }
 
@@ -435,9 +386,11 @@ The into parameter points to a variable (a pointer to a int slice) which will be
 */
 func (c *Cmd) Floats64OptPtr(into *[]float64, name string, value []float64, desc string) {
 	c.Floats64Ptr(into, Floats64Opt{
-		Name:  name,
+		Opt: Opt{
+			Name: name,
+			Desc: desc,
+		},
 		Value: value,
-		Desc:  desc,
 	})
 }
 
