@@ -3,8 +3,8 @@ package fsmtest
 import (
 	"testing"
 
-	"github.com/jawher/mow.cli/internal/fsm"
-	"github.com/jawher/mow.cli/internal/matcher"
+	"github.com/duanqy/cli/internal/fsm"
+	"github.com/duanqy/cli/internal/matcher"
 	"github.com/stretchr/testify/require"
 )
 

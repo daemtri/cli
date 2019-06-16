@@ -3,10 +3,10 @@ package parser
 import (
 	"fmt"
 
-	"github.com/jawher/mow.cli/internal/container"
-	"github.com/jawher/mow.cli/internal/fsm"
-	"github.com/jawher/mow.cli/internal/lexer"
-	"github.com/jawher/mow.cli/internal/matcher"
+	"github.com/duanqy/cli/internal/container"
+	"github.com/duanqy/cli/internal/fsm"
+	"github.com/duanqy/cli/internal/lexer"
+	"github.com/duanqy/cli/internal/matcher"
 )
 
 // Params are used to cofigure the parser

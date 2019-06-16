@@ -3,8 +3,8 @@ package cli
 import (
 	"flag"
 	"fmt"
-	"github.com/jawher/mow.cli/internal/container"
-	"github.com/jawher/mow.cli/internal/values"
+	"github.com/duanqy/cli/internal/container"
+	"github.com/duanqy/cli/internal/values"
 	"strings"
 	"text/tabwriter"
 )

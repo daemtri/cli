@@ -6,8 +6,8 @@ import (
 
 	"fmt"
 
-	"github.com/jawher/mow.cli/internal/container"
-	"github.com/jawher/mow.cli/internal/values"
+	"github.com/duanqy/cli/internal/container"
+	"github.com/duanqy/cli/internal/values"
 	"github.com/stretchr/testify/require"
 )
 

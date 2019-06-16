@@ -5,9 +5,9 @@ import (
 
 	"strings"
 
-	"github.com/jawher/mow.cli/internal/container"
-	"github.com/jawher/mow.cli/internal/fsm/fsmtest"
-	"github.com/jawher/mow.cli/internal/lexer"
+	"github.com/duanqy/cli/internal/container"
+	"github.com/duanqy/cli/internal/fsm/fsmtest"
+	"github.com/duanqy/cli/internal/lexer"
 	"github.com/stretchr/testify/require"
 )
 

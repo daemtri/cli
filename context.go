@@ -10,6 +10,10 @@ type context struct {
 	err    error
 }
 
+func (c context) Prompt(name string, desc string) Value {
+	panic("implement me")
+}
+
 func (c context) Error() error {
 	return c.err
 }

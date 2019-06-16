@@ -5,9 +5,9 @@ import (
 
 	"fmt"
 
-	"github.com/jawher/mow.cli/internal/container"
-	"github.com/jawher/mow.cli/internal/matcher"
-	"github.com/jawher/mow.cli/internal/values"
+	"github.com/duanqy/cli/internal/container"
+	"github.com/duanqy/cli/internal/matcher"
+	"github.com/duanqy/cli/internal/values"
 )
 
 // NewArg creates a positional argument matcher given its name, e.g. SRC

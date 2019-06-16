@@ -6,8 +6,7 @@ import (
 	"io"
 	"os"
 
-	"github.com/jawher/mow.cli/internal/container"
-	"github.com/jawher/mow.cli/internal/flow"
+	"github.com/duanqy/cli/internal/container"
 )
 
 // App represents the structure of a CLI app. It should be constructed using the App() function

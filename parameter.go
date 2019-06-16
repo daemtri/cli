@@ -3,9 +3,9 @@ package cli
 import (
 	"flag"
 	"fmt"
-	"github.com/jawher/mow.cli/internal/container"
-	"github.com/jawher/mow.cli/internal/lexer"
-	"github.com/jawher/mow.cli/internal/values"
+	"github.com/duanqy/cli/internal/container"
+	"github.com/duanqy/cli/internal/lexer"
+	"github.com/duanqy/cli/internal/values"
 	"strings"
 	"time"
 )
@@ -13,6 +13,7 @@ import (
 type Parameter interface {
 	Env(key string) Parameter
 	Hide() Parameter
+	Editor(path string) Parameter
 	Validate(func(string) bool) Parameter
 
 	Password() *string
@@ -62,6 +63,10 @@ type Parameter interface {
 
 type parameter struct {
 	c *container.Container
+}
+
+func (pa *parameter) Editor(path string) Parameter {
+	panic("implement me")
 }
 
 func (pa *parameter) Password() *string {

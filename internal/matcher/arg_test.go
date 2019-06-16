@@ -3,7 +3,7 @@ package matcher
 import (
 	"testing"
 
-	"github.com/jawher/mow.cli/internal/container"
+	"github.com/duanqy/cli/internal/container"
 	"github.com/stretchr/testify/require"
 )
 
