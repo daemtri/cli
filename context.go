@@ -10,6 +10,10 @@ type context struct {
 	err    error
 }
 
+func (c context) Permit(ask string) bool {
+	panic("implement me")
+}
+
 func (c context) Prompt(name string, desc string) Value {
 	panic("implement me")
 }
@@ -35,8 +39,6 @@ var _ Context = &context{}
 type Value interface {
 	Bool() bool
 	Duration() time.Duration
-	// 输入不可见
-	Password() string
 
 	String() string
 	Int() int
@@ -53,10 +55,10 @@ type Value interface {
 	Float64Slice() []float64
 }
 
-
 type Context interface {
 	Argument(name string) Value
 	Option(name string) Value
 	Prompt(name string, desc string) Value
+	Permit(ask string) bool
 	Error() error
 }

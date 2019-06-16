@@ -11,9 +11,10 @@ import (
 )
 
 type Parameter interface {
-	Env(key string) Parameter
+	Env(key string, deprecated ...string) Parameter
 	Hide() Parameter
 	Editor(path string) Parameter
+	Deprecated(phrases string) Parameter
 	Validate(func(string) bool) Parameter
 
 	Password() *string
@@ -65,6 +66,16 @@ type parameter struct {
 	c *container.Container
 }
 
+func (pa *parameter) Env(key string, deprecated ...string) Parameter {
+	pa.c.EnvVar = key
+	pa.c.ValueSetFromEnv = values.SetFromEnv(pa.c.Value, pa.c.EnvVar)
+	return pa
+}
+
+func (pa *parameter) Deprecated(phrases string) Parameter {
+	panic("implement me")
+}
+
 func (pa *parameter) Editor(path string) Parameter {
 	panic("implement me")
 }
@@ -81,11 +92,6 @@ func (pa *parameter) Validate(func(string) bool) Parameter {
 	panic("implement me")
 }
 
-func (pa *parameter) Env(key string) Parameter {
-	pa.c.EnvVar = key
-	pa.c.ValueSetFromEnv = values.SetFromEnv(pa.c.Value, pa.c.EnvVar)
-	return pa
-}
 
 func (pa *parameter) Hide() Parameter {
 	pa.c.Hidden = true
