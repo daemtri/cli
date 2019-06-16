@@ -2,14 +2,21 @@ package cli
 
 import (
 	"flag"
+	"fmt"
 	"github.com/jawher/mow.cli/internal/container"
+	"github.com/jawher/mow.cli/internal/lexer"
 	"github.com/jawher/mow.cli/internal/values"
+	"strings"
 	"time"
 )
 
 type Parameter interface {
 	Env(key string) Parameter
 	Hide() Parameter
+	Validate(func(string) bool) Parameter
+
+	Password() *string
+	PasswordVar(p *string)
 
 	Bool(def bool) *bool
 	BoolVar(p *bool, def bool)
@@ -17,8 +24,14 @@ type Parameter interface {
 	String(def string) *string
 	StringVar(p *string, def string)
 
+	StringSlice(def []string) *[]string
+	StringSliceVar(p *[]string, def []string)
+
 	Int(def int) *int
 	IntVar(p *int, def int)
+
+	IntSlice(def []int) *[]int
+	IntSliceVar(p *[]int, def []int)
 
 	Int64(def int64) *int64
 	Int64Var(p *int64, def int64)
@@ -26,11 +39,20 @@ type Parameter interface {
 	Uint(def uint) *uint
 	UintVar(p *uint, def uint)
 
+	UintSlice(def []uint) *[]uint
+	UintSliceVar(p *[]uint, def []uint)
+
 	Uint64(def uint64) *uint64
 	Uint64Var(p *uint64, def uint64)
 
+	Uint64Slice(def []uint64) *[]uint64
+	Uint64SliceVar(p *[]uint64, def []uint64)
+
 	Float64(def float64) *float64
 	Float64Var(p *float64, def float64)
+
+	Float64Slice(def []float64) *[]float64
+	Float64SliceVar(p *[]float64, def []float64)
 
 	Duration(def time.Duration) *time.Duration
 	DurationVar(p *time.Duration, def time.Duration)
@@ -42,6 +64,18 @@ type parameter struct {
 	c *container.Container
 }
 
+func (pa *parameter) Password() *string {
+	panic("implement me")
+}
+
+func (pa *parameter) PasswordVar(p *string) {
+	panic("implement me")
+}
+
+func (pa *parameter) Validate(func(string) bool) Parameter {
+	panic("implement me")
+}
+
 func (pa *parameter) Env(key string) Parameter {
 	pa.c.EnvVar = key
 	pa.c.ValueSetFromEnv = values.SetFromEnv(pa.c.Value, pa.c.EnvVar)
@@ -49,8 +83,48 @@ func (pa *parameter) Env(key string) Parameter {
 }
 
 func (pa *parameter) Hide() Parameter {
-	pa.c.HideValue = true
+	pa.c.Hidden = true
 	return pa
+}
+
+func (pa *parameter) StringSlice(def []string) *[]string {
+	panic("implement me")
+}
+
+func (pa *parameter) StringSliceVar(p *[]string, def []string) {
+	panic("implement me")
+}
+
+func (pa *parameter) IntSlice(def []int) *[]int {
+	panic("implement me")
+}
+
+func (pa *parameter) IntSliceVar(p *[]int, def []int) {
+	panic("implement me")
+}
+
+func (pa *parameter) UintSlice(def []uint) *[]uint {
+	panic("implement me")
+}
+
+func (pa *parameter) UintSliceVar(p *[]uint, def []uint) {
+	panic("implement me")
+}
+
+func (pa *parameter) Uint64Slice(def []uint64) *[]uint64 {
+	panic("implement me")
+}
+
+func (pa *parameter) Uint64SliceVar(p *[]uint64, def []uint64) {
+	panic("implement me")
+}
+
+func (pa *parameter) Float64Slice(def []float64) *[]float64 {
+	panic("implement me")
+}
+
+func (pa *parameter) Float64SliceVar(p *[]float64, def []float64) {
+	panic("implement me")
 }
 
 func (pa *parameter) Var(v flag.Value) {
@@ -149,4 +223,52 @@ func (c *Cmd) Argument(name, desc string) Parameter {
 	param := &container.Container{Name: name, Desc: desc, Value: values.NewString(into, "")}
 	c.mkArg(param)
 	return &parameter{c: param}
+}
+
+func mkOptStrs(optName string) []string {
+	res := strings.Fields(optName)
+	for i, name := range res {
+		prefix := "-"
+		if len(name) > 1 {
+			prefix = "--"
+		}
+		res[i] = prefix + name
+	}
+	return res
+}
+
+func (c *Cmd) mkOpt(opt *container.Container) {
+	opt.Names = mkOptStrs(opt.Name)
+
+	c.options = append(c.options, opt)
+	for _, name := range opt.Names {
+		if _, found := c.optionsIdx[name]; found {
+			panic(fmt.Sprintf("duplicate option name %q", name))
+		}
+		c.optionsIdx[name] = opt
+	}
+}
+
+func (c *Cmd) mkArg(arg *container.Container) {
+	if !validArgName(arg.Name) {
+		panic(fmt.Sprintf("invalid argument name %q: must be in all caps", arg.Name))
+	}
+	if _, found := c.argsIdx[arg.Name]; found {
+		panic(fmt.Sprintf("duplicate argument name %q", arg.Name))
+	}
+
+	c.args = append(c.args, arg)
+	c.argsIdx[arg.Name] = arg
+}
+
+func validArgName(n string) bool {
+	tokens, err := lexer.Tokenize(n)
+	if err != nil {
+		return false
+	}
+	if len(tokens) != 1 {
+		return false
+	}
+
+	return tokens[0].Typ == lexer.TTArg
 }

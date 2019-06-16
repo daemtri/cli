@@ -3,28 +3,26 @@ package cli
 import (
 	"flag"
 	"fmt"
-	"io"
-	"strings"
-	"text/tabwriter"
-
 	"github.com/jawher/mow.cli/internal/container"
-	"github.com/jawher/mow.cli/internal/flow"
 	"github.com/jawher/mow.cli/internal/fsm"
 	"github.com/jawher/mow.cli/internal/lexer"
 	"github.com/jawher/mow.cli/internal/parser"
-	"github.com/jawher/mow.cli/internal/values"
+	"io"
+	"strings"
 )
+
+type Action func(ctx Context) error
 
 // Cmd represents a command (or sub command) in a CLI application. It should be constructed
 // by calling Command() on an app to create a top level command or by calling Command() on another
 // command to create a sub command
 type Cmd struct {
 	// The code to execute when this command is matched
-	Action func()
+	Action Action
 	// The code to execute before this command or any of its children is matched
-	Before func()
+	Before Action
 	// The code to execute after this command or any of its children is matched
-	After func()
+	After Action
 	// The command options and arguments
 	Spec string
 	// The command long description to be shown when help is requested
@@ -43,7 +41,7 @@ type Cmd struct {
 	args       []*container.Container
 	argsIdx    map[string]*container.Container
 
-	parents []string
+	parent *Cmd
 
 	fsm *fsm.State
 }
@@ -75,18 +73,13 @@ func (c *Cmd) Command(name, desc string, init CmdInitializer) {
 		optionsIdx:    map[string]*container.Container{},
 		args:          []*container.Container{},
 		argsIdx:       map[string]*container.Container{},
+		parent:        c,
 	})
 }
 
 func (c *Cmd) doInit() error {
 	if c.init != nil {
 		c.init(c)
-	}
-
-	parents := append(c.parents, c.name)
-
-	for _, sub := range c.commands {
-		sub.parents = parents
 	}
 
 	if len(c.Spec) == 0 {
@@ -135,143 +128,33 @@ func (c *Cmd) onError(err error) {
 
 }
 
-// PrintHelp prints the command's help message.
-// In most cases the library users won't need to call this method, unless
-// a more complex validation is needed
-func (c *Cmd) PrintHelp() {
-	c.printHelp(false)
+func (c *Cmd) callBefore() error {
+	if c.parent != nil {
+		if err := c.parent.callBefore(); err != nil {
+			return err
+		}
+	}
+	if c.Before != nil {
+		return c.Before(newContext(c))
+	}
+	return nil
 }
 
-// PrintLongHelp prints the command's help message using the command long description if specified.
-// In most cases the library users won't need to call this method, unless
-// a more complex validation is needed
-func (c *Cmd) PrintLongHelp() {
-	c.printHelp(true)
+func (c *Cmd) callAfter(err error) error {
+	ctx := newContext(c)
+	ctx.err = err
+	if c.After != nil {
+		if err := c.After(ctx); err != nil {
+			ctx.err = err
+		}
+	}
+	if c.parent != nil {
+		return c.parent.callAfter(err)
+	}
+	return err
 }
 
-func (c *Cmd) printHelp(longDesc bool) {
-	full := append(c.parents, c.name)
-	path := strings.Join(full, " ")
-	_,_ = fmt.Fprintf(stdErr, "\nUsage: %s", path)
-
-	spec := strings.TrimSpace(c.Spec)
-	if len(spec) > 0 {
-		_,_ = fmt.Fprintf(stdErr, " %s", spec)
-	}
-
-	if len(c.commands) > 0 {
-		_,_ =fmt.Fprint(stdErr, " COMMAND [arg...]")
-	}
-	_,_ =fmt.Fprint(stdErr, "\n\n")
-
-	desc := c.desc
-	if longDesc && len(c.LongDesc) > 0 {
-		desc = c.LongDesc
-	}
-	if len(desc) > 0 {
-		_,_ =fmt.Fprintf(stdErr, "%s\n", desc)
-	}
-
-	w := tabwriter.NewWriter(stdErr, 15, 1, 3, ' ', 0)
-
-	if len(c.args) > 0 {
-		_,_ =fmt.Fprint(w, "\t\nArguments:\t\n")
-		for _, arg := range c.args {
-			if arg.HideValue {
-				continue
-			}
-			var (
-				env   = formatEnvVarsForHelp(arg.EnvVar)
-				value = formatValueForHelp(arg.Value)
-			)
-			printTabbedRow(w, arg.Name, joinStrings(arg.Desc, env, value))
-		}
-	}
-
-	if len(c.options) > 0 {
-		_,_ =fmt.Fprint(w, "\t\nOptions:\t\n")
-		for _, opt := range c.options {
-			if opt.HideValue {
-				continue
-			}
-			var (
-				optNames = formatOptNamesForHelp(opt)
-				env      = formatEnvVarsForHelp(opt.EnvVar)
-				value    = formatValueForHelp(opt.Value)
-			)
-			printTabbedRow(w, optNames, joinStrings(opt.Desc, env, value))
-		}
-	}
-
-	if len(c.commands) > 0 {
-		_,_ =fmt.Fprint(w, "\t\nCommands:\t\n")
-
-		for _, c := range c.commands {
-			_,_ =fmt.Fprintf(w, "  %s\t%s\n", strings.Join(c.aliases, ", "), c.desc)
-		}
-	}
-
-	if len(c.commands) > 0 {
-		_,_ =fmt.Fprintf(w, "\t\nRun '%s COMMAND --help' for more information on a command.\n", path)
-	}
-
-	_ = w.Flush()
-}
-
-func formatOptNamesForHelp(o *container.Container) string {
-	short, long := "", ""
-
-	for _, n := range o.Names {
-		if len(n) == 2 && short == "" {
-			short = n
-		}
-
-		if len(n) > 2 && long == "" {
-			long = n
-		}
-	}
-
-	switch {
-	case short != "" && long != "":
-		return fmt.Sprintf("%s, %s", short, long)
-	case short != "":
-		return short
-	case long != "":
-		// 2 spaces instead of the short option (-x), one space for the comma (,) and one space for the after comma blank
-		return fmt.Sprintf("    %s", long)
-	default:
-		return ""
-	}
-}
-
-func formatValueForHelp(v flag.Value) string {
-	if dv, ok := v.(values.DefaultValued); ok {
-		if dv.IsDefault() {
-			return ""
-		}
-	}
-
-	return fmt.Sprintf("(default %s)", v.String())
-}
-
-func formatEnvVarsForHelp(envVars string) string {
-	if strings.TrimSpace(envVars) == "" {
-		return ""
-	}
-	vars := strings.Fields(envVars)
-	res := "(env"
-	sep := " "
-	for i, v := range vars {
-		if i > 0 {
-			sep = ", "
-		}
-		res += fmt.Sprintf("%s$%s", sep, v)
-	}
-	res += ")"
-	return res
-}
-
-func (c *Cmd) parse(args []string, entry, inFlow, outFlow *flow.Step) error {
+func (c *Cmd) run(args []string) (err error) {
 	if c.helpRequested(args) {
 		c.PrintLongHelp()
 		c.onError(errHelpRequested)
@@ -281,41 +164,22 @@ func (c *Cmd) parse(args []string, entry, inFlow, outFlow *flow.Step) error {
 	nargsLen := c.getOptsAndArgs(args)
 
 	if err := c.fsm.Parse(args[:nargsLen]); err != nil {
-		fmt.Fprintf(stdErr, "Error: %s\n", err.Error())
+		_, _ = fmt.Fprintf(stdErr, "error: %s\n", err.Error())
 		c.PrintHelp()
 		c.onError(err)
 		return err
 	}
 
-	newInFlow := &flow.Step{
-		Do:     c.Before,
-		Error:  outFlow,
-		Desc:   fmt.Sprintf("%s.Before", c.name),
-		Exiter: exiter,
-	}
-	inFlow.Success = newInFlow
-
-	newOutFlow := &flow.Step{
-		Do:      c.After,
-		Success: outFlow,
-		Error:   outFlow,
-		Desc:    fmt.Sprintf("%s.After", c.name),
-		Exiter:  exiter,
-	}
-
 	args = args[nargsLen:]
 	if len(args) == 0 {
 		if c.Action != nil {
-			newInFlow.Success = &flow.Step{
-				Do:      c.Action,
-				Success: newOutFlow,
-				Error:   newOutFlow,
-				Desc:    fmt.Sprintf("%s.Action", c.name),
-				Exiter:  exiter,
+			if err = c.callBefore(); err != nil {
+				return err
 			}
-
-			entry.Run(nil)
-			return nil
+			defer func() {
+				err = c.callAfter(err)
+			}()
+			return c.Action(newContext(c))
 		}
 		c.PrintHelp()
 		c.onError(nil)
@@ -328,23 +192,21 @@ func (c *Cmd) parse(args []string, entry, inFlow, outFlow *flow.Step) error {
 			if err := sub.doInit(); err != nil {
 				panic(err)
 			}
-			return sub.parse(args[1:], entry, newInFlow, newOutFlow)
+			return sub.run(args[1:])
 		}
 	}
 
-	var err error
 	switch {
 	case strings.HasPrefix(arg, "-"):
-		err = fmt.Errorf("Error: illegal option %s", arg)
-		fmt.Fprintln(stdErr, err.Error())
+		err = fmt.Errorf("error: illegal option %s", arg)
+		_, _ = fmt.Fprintln(stdErr, err.Error())
 	default:
-		err = fmt.Errorf("Error: illegal input %s", arg)
-		fmt.Fprintln(stdErr, err.Error())
+		err = fmt.Errorf("error: illegal input %s", arg)
+		_, _ = fmt.Fprintln(stdErr, err.Error())
 	}
 	c.PrintHelp()
 	c.onError(err)
 	return err
-
 }
 
 func (c *Cmd) helpRequested(args []string) bool {
@@ -405,13 +267,13 @@ func joinStrings(parts ...string) string {
 
 func printTabbedRow(w io.Writer, s1 string, s2 string) {
 	lines := strings.Split(s2, "\n")
-	_,_ = fmt.Fprintf(w, "  %s\t%s\n", s1, strings.TrimSpace(lines[0]))
+	_, _ = fmt.Fprintf(w, "  %s\t%s\n", s1, strings.TrimSpace(lines[0]))
 
 	if len(lines) == 1 {
 		return
 	}
 
 	for _, line := range lines[1:] {
-		_,_ = fmt.Fprintf(w, "  %s\t%s\n", "", strings.TrimSpace(line))
+		_, _ = fmt.Fprintf(w, "  %s\t%s\n", "", strings.TrimSpace(line))
 	}
 }
