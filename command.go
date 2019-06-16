@@ -13,6 +13,10 @@ import (
 
 type Action func(ctx Context) error
 
+type Command interface {
+
+}
+
 // Cmd represents a command (or sub command) in a CLI application. It should be constructed
 // by calling Command() on an app to create a top level command or by calling Command() on another
 // command to create a sub command
